@@ -1,0 +1,28 @@
+server:
+  port: 8080
+  read_timeout: 15s
+  write_timeout: 15s
+  idle_timeout: 60s
+
+database:
+  host: localhost
+  port: 3306
+  user: taskmanager
+  password: taskmanager_pass
+  name: taskmanager
+  max_open_conns: 25
+  max_idle_conns: 10
+  conn_max_lifetime: 5m
+
+redis:
+  addr: localhost:6379
+  password: ""
+  db: 0
+  cache_ttl: 5m
+
+jwt:
+  secret: "change-me-in-production-please"
+  expiration: 24h
+
+rate_limit:
+  requests_per_minute: 100

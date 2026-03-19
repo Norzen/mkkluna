@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DATABASE_HOST=mysql
+      - DATABASE_PORT=3306
+      - DATABASE_USER=taskmanager
+      - DATABASE_PASSWORD=taskmanager_pass
+      - DATABASE_NAME=taskmanager
+      - REDIS_ADDR=redis:6379
+      - JWT_SECRET=change-me-in-production-please
+    volumes:
+      - ./config.yaml:/app/config.yaml
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: taskmanager
+      MYSQL_USER: taskmanager
+      MYSQL_PASSWORD: taskmanager_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./migrations/001_init.sql:/docker-entrypoint-initdb.d/001_init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
